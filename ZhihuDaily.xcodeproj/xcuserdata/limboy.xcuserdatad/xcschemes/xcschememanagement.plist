@@ -4,6 +4,13 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>All in ZhihuDailyTests.swift.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
 		<key>ZhihuDaily.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -12,6 +19,11 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>6A33C1261EC6BCA10033C4B1</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>6AA6C9281EC1E9F30061F02E</key>
 		<dict>
 			<key>primary</key>
