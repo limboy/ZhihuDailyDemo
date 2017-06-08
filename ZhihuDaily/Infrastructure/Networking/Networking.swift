@@ -30,17 +30,17 @@ public struct Resource<A> {
     let parse: (NSData) -> A?
 }
 
-public enum Reason {
+public enum Reason: Error {
     case CouldNotParseJSON
     case NoData
     case NoSuccessStatusCode(statusCode: Int)
     case Other(NSError?)
 }
 
-public func apiRequest<A>(modifyRequest: ((NSMutableURLRequest) -> ())? = nil, baseURL: NSURL, resource: Resource<A>, failure: @escaping (Reason, NSData?) -> (), success: @escaping (A) -> ()) {
+public func apiRequest<A>(modifyRequest: ((NSMutableURLRequest) -> ())? = nil, baseURL: URL, resource: Resource<A>, failure: @escaping (Reason, NSData?) -> (), success: @escaping (A) -> ()) {
     let session = URLSession.shared
     let url = baseURL.appendingPathComponent(resource.path)
-    let request = NSMutableURLRequest(url: url!)
+    let request = NSMutableURLRequest(url: url)
     request.httpMethod = resource.method.rawValue
     request.httpBody = resource.requestBody as Data?
     modifyRequest?(request)
