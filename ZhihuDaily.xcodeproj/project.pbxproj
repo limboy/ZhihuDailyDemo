@@ -13,6 +13,7 @@
 		6A54D4771EE8BB110001FAEE /* NewsFeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A54D4761EE8BB110001FAEE /* NewsFeedViewModel.swift */; };
 		6A54D4791EE8BB330001FAEE /* NewsFeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A54D4781EE8BB330001FAEE /* NewsFeedViewController.swift */; };
 		6A54D47B1EE8BBF10001FAEE /* NewsFeedRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A54D47A1EE8BBF10001FAEE /* NewsFeedRepository.swift */; };
+		6A54D47D1EE9D1F80001FAEE /* Networking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A54D47C1EE9D1F80001FAEE /* Networking.swift */; };
 		6AA6C92D1EC1E9F30061F02E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AA6C92C1EC1E9F30061F02E /* AppDelegate.swift */; };
 		6AA6C9341EC1E9F30061F02E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6AA6C9331EC1E9F30061F02E /* Assets.xcassets */; };
 		6AA6C9371EC1E9F30061F02E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6AA6C9351EC1E9F30061F02E /* LaunchScreen.storyboard */; };
@@ -62,6 +63,7 @@
 		6A54D4761EE8BB110001FAEE /* NewsFeedViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewsFeedViewModel.swift; sourceTree = "<group>"; };
 		6A54D4781EE8BB330001FAEE /* NewsFeedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewsFeedViewController.swift; sourceTree = "<group>"; };
 		6A54D47A1EE8BBF10001FAEE /* NewsFeedRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewsFeedRepository.swift; sourceTree = "<group>"; };
+		6A54D47C1EE9D1F80001FAEE /* Networking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Networking.swift; sourceTree = "<group>"; };
 		6AA6C9291EC1E9F30061F02E /* ZhihuDaily.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZhihuDaily.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6AA6C92C1EC1E9F30061F02E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6AA6C9331EC1E9F30061F02E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -210,6 +212,7 @@
 		6ADC97CB1EC24CFC009F3795 /* Networking */ = {
 			isa = PBXGroup;
 			children = (
+				6A54D47C1EE9D1F80001FAEE /* Networking.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -409,6 +412,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6AA6C9571EC1ED1A0061F02E /* Route.swift in Sources */,
+				6A54D47D1EE9D1F80001FAEE /* Networking.swift in Sources */,
 				6ADC97EB1EC37CF0009F3795 /* LoadResult.swift in Sources */,
 				6ADC97ED1EC44B0A009F3795 /* CartService.swift in Sources */,
 				6AA6C92D1EC1E9F30061F02E /* AppDelegate.swift in Sources */,
