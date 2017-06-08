@@ -8,16 +8,34 @@
 
 import Foundation
 import UIKit
+import RxSwift
 
 class NewsFeedViewController: UIViewController {
-    private var tableView: UITableView?
+    private let tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        return tableView
+    }()
+    
+    fileprivate let viewModel: NewsFeedViewModel = NewsFeedViewModel()
+    
+    fileprivate let disposeBag: DisposeBag = DisposeBag()
     
     override func viewDidLoad() {
-        tableView = UITableView(frame: view.frame)
-        tableView?.delegate = self
-        tableView?.dataSource = self
-        tableView?.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
-        view.addSubview(tableView!)
+        tableView.frame = view.frame
+        tableView.delegate = self
+        tableView.dataSource = self
+        view.addSubview(tableView)
+
+        handleDataChange()
+    }
+}
+
+extension NewsFeedViewController {
+    func handleDataChange() {
+        viewModel.refreshingStatus.subscribe(onNext: { item in
+            print(item)
+        }).disposed(by: disposeBag)
     }
 }
 
