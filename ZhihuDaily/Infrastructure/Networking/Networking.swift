@@ -25,9 +25,9 @@ public enum Method: String { // Bluntly stolen from Alamofire
 public struct Resource<A> {
     let path: String
     let method : Method
-    let requestBody: NSData?
+    let requestBody: Data?
     let headers : [String:String]
-    let parse: (NSData) -> A?
+    let parse: (Data) -> A?
 }
 
 public enum Reason: Error {
@@ -37,7 +37,7 @@ public enum Reason: Error {
     case Other(NSError?)
 }
 
-public func apiRequest<A>(modifyRequest: ((NSMutableURLRequest) -> ())? = nil, baseURL: URL, resource: Resource<A>, failure: @escaping (Reason, NSData?) -> (), success: @escaping (A) -> ()) {
+public func apiRequest<A>(modifyRequest: ((NSMutableURLRequest) -> ())? = nil, baseURL: URL, resource: Resource<A>, failure: @escaping (Reason, Data?) -> (), success: @escaping (A) -> ()) {
     let session = URLSession.shared
     let url = baseURL.appendingPathComponent(resource.path)
     let request = NSMutableURLRequest(url: url)
@@ -51,19 +51,19 @@ public func apiRequest<A>(modifyRequest: ((NSMutableURLRequest) -> ())? = nil, b
         if let httpResponse = response as? HTTPURLResponse {
             if httpResponse.statusCode == 200 {
                 if let responseData = data {
-                    if let result = resource.parse(responseData as NSData) {
+                    if let result = resource.parse(responseData) {
                         success(result)
                     } else {
-                        failure(Reason.CouldNotParseJSON, data as NSData?)
+                        failure(Reason.CouldNotParseJSON, data)
                     }
                 } else {
-                    failure(Reason.NoData, data! as NSData)
+                    failure(Reason.NoData, data)
                 }
             } else {
-                failure(Reason.NoSuccessStatusCode(statusCode: httpResponse.statusCode), data! as NSData)
+                failure(Reason.NoSuccessStatusCode(statusCode: httpResponse.statusCode), data)
             }
         } else {
-            failure(Reason.Other(error as NSError?), data! as NSData)
+            failure(Reason.Other(error as NSError?), data)
         }
     }
     task.resume()
@@ -72,7 +72,7 @@ public func apiRequest<A>(modifyRequest: ((NSMutableURLRequest) -> ())? = nil, b
 // Here are some convenience functions for dealing with JSON APIs
 public typealias JSONDictionary = [String:AnyObject]
 
-func decodeJSON(data: NSData) -> JSONDictionary? {
+func decodeJSON(data: Data) -> JSONDictionary? {
     return (try? JSONSerialization.jsonObject(with: data as Data, options: JSONSerialization.ReadingOptions())) as? JSONDictionary
 }
 
@@ -85,5 +85,5 @@ public func jsonResource<A>(path: String, method: Method, requestParameters: JSO
     let f = { decodeJSON(data: $0).flatMap(parse) }
     let jsonBody = encodeJSON(dict: requestParameters)
     let headers = ["Content-Type": "application/json"]
-    return Resource(path: path, method: method, requestBody: jsonBody! as NSData, headers: headers, parse: f)
+    return Resource(path: path, method: method, requestBody: jsonBody, headers: headers, parse: f)
 }

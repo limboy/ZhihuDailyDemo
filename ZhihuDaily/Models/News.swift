@@ -5,6 +5,13 @@
 
 import Foundation
 
-struct News {
-    var id: String
+struct NewsItem {
+    var id: NSNumber
+    var images: [String]?
+    var title: String
+}
+
+struct NewsList {
+    var news: [NewsItem]?
+    var date: String
 }
