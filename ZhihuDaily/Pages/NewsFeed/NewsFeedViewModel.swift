@@ -32,7 +32,7 @@ class NewsFeedViewModel {
         news.value = newsValue
         
         NewsFeedRepository.news.subscribe(onNext: {[unowned self] (item) in
-            newsValue.loadingStatus = .none
+            newsValue.loadingStatus = .loaded
             newsValue.previousNews = newsValue.currentNews
             newsValue.currentNews = self._parseResult(result: item)
             self.news.value = newsValue
