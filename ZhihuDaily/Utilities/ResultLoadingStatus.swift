@@ -10,6 +10,7 @@ import Foundation
 
 enum ResultLoadingStatus: Equatable {
     case none
+    case initialLoading
     case loading
     case loaded
     case failure(Error)
@@ -17,6 +18,8 @@ enum ResultLoadingStatus: Equatable {
     static func ==(lhs: ResultLoadingStatus, rhs: ResultLoadingStatus) -> Bool {
         switch (lhs, rhs) {
         case (.none, .none):
+            return true
+        case (.initialLoading, .initialLoading):
             return true
         case (.loading, .loading):
             return true

@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import RxSwift
+import RxCocoa
 
 class NewsFeedViewController: UITableViewController {
     
@@ -19,6 +20,13 @@ class NewsFeedViewController: UITableViewController {
     fileprivate let refreshIndicator: UIRefreshControl = UIRefreshControl()
     
     fileprivate let initialLoadingIndicator = UIActivityIndicatorView()
+    
+    fileprivate let reloadButton:UIButton = {
+        let button = UIButton.init(type: .system)
+        button.frame = CGRect(x: UIScreen.main.bounds.width / 2 - 32, y: 100, width: 64, height: 32)
+        button.setTitle("Reload", for: .normal)
+        return button
+    }()
     
     override func viewDidLoad() {
         // MARK: tableView
@@ -49,10 +57,19 @@ class NewsFeedViewController: UITableViewController {
             view.addSubview(initialLoadingIndicator)
             initialLoadingIndicator.startAnimating()
         })()
+        
+        // MARK: reload button
+        ({
+            view.addSubview(reloadButton)
+            reloadButton.isHidden = true
+            reloadButton.rx.tap.subscribe(onNext: { [unowned self] item in
+                self.viewModel.initialRefresh()
+            }).addDisposableTo(disposeBag)
+        })()
 
         handleDataChange()
         
-        viewModel.refresh()
+        viewModel.initialRefresh()
     }
     
     func onRefreshEventChanged(sender: UIRefreshControl) {
@@ -67,7 +84,23 @@ extension NewsFeedViewController {
         viewModel.news.asObservable()
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: {[unowned self] item in
-                if (item.loadingStatus != .loading && item.loadingStatus != .none) {
+                
+                if case .failure(let error) = item.loadingStatus {
+                    dump(error)
+                    if (self.initialLoadingIndicator.isAnimating) {
+                        self.reloadButton.isHidden = false
+                    }
+                }
+                
+                if (item.loadingStatus == .initialLoading) {
+                    self.reloadButton.isHidden = true
+                    self.initialLoadingIndicator.startAnimating()
+                }
+                
+                if (item.loadingStatus != .loading &&
+                    item.loadingStatus != .initialLoading &&
+                    item.loadingStatus != .none) {
+                    
                     self.initialLoadingIndicator.stopAnimating()
                     self.refreshIndicator.endRefreshing()
                 }
@@ -75,6 +108,7 @@ extension NewsFeedViewController {
                 if (item.loadingStatus == .loaded) {
                     self.tableView.reloadData()
                 }
+                
             }).addDisposableTo(disposeBag)
     }
 }

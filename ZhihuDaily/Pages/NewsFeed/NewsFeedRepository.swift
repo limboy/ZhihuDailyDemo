@@ -14,7 +14,7 @@ class NewsFeedRepository {
         return Observable.create({ observer in
             let resource = Resource(path: "/api/4/news/latest", method: .GET, requestBody: nil, headers: ["Content-Type": "application/json"], parse: decodeJSON)
             
-            apiRequest(baseURL: URL(string: "https://news-at.zhihu.com/")!, resource: resource, failure: { (reason, result) in
+            apiRequest(baseURL: URL(string: "https://news-at1.zhihu.com/")!, resource: resource, failure: { (reason, result) in
                 observer.on(.error(reason))
             }, success: { result in
                 observer.on(.next(result))
