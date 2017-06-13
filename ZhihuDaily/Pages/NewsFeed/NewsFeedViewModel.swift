@@ -10,62 +10,53 @@ import Foundation
 import RxSwift
 
 class NewsFeedViewModel {
-    
-    struct News {
-        var loadingStatus: ResultLoadingStatus = .none
-        var previousNews: NewsList?
-        var currentNews: NewsList?
-    }
-    
+
     let disposeBag: DisposeBag = DisposeBag()
     
-    var news:Variable<News> = Variable(News())
+    var news:Variable<ResultModel<NewsList>> = Variable(ResultModel())
     
-    func initialRefresh() {
-        _refresh(isInitial: true)
+    func initialLoading() {
+        loadData(.initial)
     }
     
     func refresh() {
-        _refresh(isInitial: false)
+        loadData(.refresh)
     }
     
-    func loadMore() {
-        
+    func loadMore(_ offset: String) {
+        loadData(.more, offset: offset)
     }
+    
+    func loadData(_ loadingType: LoadingType, offset: String = "") {
+        if (news.value.loadingStatus == .loading) {
+            return
+        }
+
+        var value = news.value
+        
+        value.loadingStatus = .loading
+        value.loadingType = loadingType
+        news.value = value
+        
+        NewsFeedRepository.news(offset).asObservable().delaySubscription(1, scheduler: MainScheduler.instance).subscribe(onNext: {[unowned self] (result) in
+            let parsedResult = self._parseResult(result: result)
+            var value = self.news.value
+            value.previousItems = self.news.value.currentItems
+            value.currentItems = parsedResult
+            value.loadingStatus = .loaded
+            self.news.value = value
+        }, onError: { (error) in
+            self.news.value.loadingStatus = .failure(error)
+        }, onCompleted: {
+            
+        }) { 
+            
+        }.addDisposableTo(disposeBag)
+    }
+    
 }
 
 private extension NewsFeedViewModel {
-    
-    func _refresh(isInitial: Bool) {
-        var newsValue = news.value
-        
-        guard newsValue.loadingStatus != .loading else {
-            return
-        }
-        
-        newsValue.loadingStatus = isInitial ? .initialLoading : .loading
-        news.value = newsValue
-        
-        NewsFeedRepository.news
-            .delaySubscription(1, scheduler: MainScheduler.instance)
-            .subscribe(onNext: {[unowned self] (item) in
-                
-                newsValue.loadingStatus = .loaded
-                newsValue.previousNews = newsValue.currentNews
-                newsValue.currentNews = self._parseResult(result: item)
-                self.news.value = newsValue
-                
-                }, onError: { (error) in
-                    
-                    newsValue.loadingStatus = .failure(error)
-                    self.news.value = newsValue
-                    
-            }, onCompleted: {
-                
-            }, onDisposed: {
-                
-            }).addDisposableTo(disposeBag)
-    }
     
     func _parseResult(result: [String:Any]?) -> NewsList? {
         

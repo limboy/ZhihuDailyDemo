@@ -10,9 +10,10 @@ import Foundation
 import RxSwift
 
 class NewsFeedRepository {
-    static let news: Observable<[String:Any]?> = {
+    static func news(_ offset: String = "") -> Observable<[String:Any]?> {
         return Observable.create({ observer in
-            let resource = Resource(path: "/api/4/news/latest", method: .GET, requestBody: nil, headers: ["Content-Type": "application/json"], parse: decodeJSON)
+            let path = offset.characters.count > 0 ? "/api/4/news/before/\(offset)" : "/api/4/news/latest"
+            let resource = Resource(path: path, method: .GET, requestBody: nil, headers: ["Content-Type": "application/json"], parse: decodeJSON)
             
             apiRequest(baseURL: URL(string: "https://news-at1.zhihu.com/")!, resource: resource, failure: { (reason, result) in
                 observer.on(.error(reason))
@@ -20,7 +21,8 @@ class NewsFeedRepository {
                 observer.on(.next(result))
                 observer.on(.completed)
             })
+            
             return Disposables.create()
         })
-    }()
+    }
 }

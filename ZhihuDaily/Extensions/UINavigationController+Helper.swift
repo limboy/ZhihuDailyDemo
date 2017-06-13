@@ -11,5 +11,4 @@ extension UINavigationController {
     static func current() -> UINavigationController {
         return UIApplication.shared.keyWindow?.rootViewController as! UINavigationController
     }
-
 }

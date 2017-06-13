@@ -1,25 +1,26 @@
 //
-//  LoadResult.swift
+//  ResultModel.swift
 //  ZhihuDaily
 //
-//  Created by limboy on 11/05/2017.
+//  Created by limboy on 10/06/2017.
 //  Copyright © 2017 limboy. All rights reserved.
 //
 
 import Foundation
 
-enum ResultLoadingStatus: Equatable {
+enum LoadingType {
+    case initial, refresh, more
+}
+
+enum LoadingStatus: Equatable {
     case none
-    case initialLoading
     case loading
     case loaded
     case failure(Error)
     
-    static func ==(lhs: ResultLoadingStatus, rhs: ResultLoadingStatus) -> Bool {
+    static func ==(lhs: LoadingStatus, rhs: LoadingStatus) -> Bool {
         switch (lhs, rhs) {
         case (.none, .none):
-            return true
-        case (.initialLoading, .initialLoading):
             return true
         case (.loading, .loading):
             return true
@@ -29,4 +30,12 @@ enum ResultLoadingStatus: Equatable {
             return false
         }
     }
+}
+
+struct ResultModel<T> {
+    var loadingStatus: LoadingStatus = .none
+    var loadingType: LoadingType = .initial
+    
+    var previousItems: T?
+    var currentItems: T?
 }

@@ -63,13 +63,14 @@ class NewsFeedViewController: UITableViewController {
             view.addSubview(reloadButton)
             reloadButton.isHidden = true
             reloadButton.rx.tap.subscribe(onNext: { [unowned self] item in
-                self.viewModel.initialRefresh()
+                self.reloadButton.isHidden = true
+                self.viewModel.initialLoading()
             }).addDisposableTo(disposeBag)
         })()
 
         handleDataChange()
         
-        viewModel.initialRefresh()
+        viewModel.initialLoading()
     }
     
     func onRefreshEventChanged(sender: UIRefreshControl) {
@@ -85,42 +86,36 @@ extension NewsFeedViewController {
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: {[unowned self] item in
                 
+                dump(item.loadingType)
+                dump(item.loadingStatus)
+                
+                if item.loadingStatus != .loading {
+                    self.initialLoadingIndicator.stopAnimating()
+                    self.refreshIndicator.endRefreshing()
+                } else {
+                    if item.loadingType == .initial {
+                        self.initialLoadingIndicator.startAnimating()
+                    }
+                    //TODO: add loading more
+                }
+                
                 if case .failure(let error) = item.loadingStatus {
-                    dump(error)
-                    if (self.initialLoadingIndicator.isAnimating) {
+                    if item.loadingType == .initial {
                         self.reloadButton.isHidden = false
                     }
                 }
-                
-                if (item.loadingStatus == .initialLoading) {
-                    self.reloadButton.isHidden = true
-                    self.initialLoadingIndicator.startAnimating()
-                }
-                
-                if (item.loadingStatus != .loading &&
-                    item.loadingStatus != .initialLoading &&
-                    item.loadingStatus != .none) {
-                    
-                    self.initialLoadingIndicator.stopAnimating()
-                    self.refreshIndicator.endRefreshing()
-                }
-                
-                if (item.loadingStatus == .loaded) {
-                    self.tableView.reloadData()
-                }
-                
             }).addDisposableTo(disposeBag)
     }
 }
 
 extension NewsFeedViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.news.value.currentNews?.news?.count ?? 0
+        return viewModel.news.value.currentItems?.news?.count ?? 0
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
-        let newsItem: NewsItem = viewModel.news.value.currentNews!.news![indexPath.row]
+        let newsItem: NewsItem = viewModel.news.value.currentItems!.news![indexPath.row]
         cell?.textLabel?.text = newsItem.title
         return cell!
     }
