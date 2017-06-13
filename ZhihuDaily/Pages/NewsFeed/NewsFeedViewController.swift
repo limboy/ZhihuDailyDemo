@@ -19,6 +19,28 @@ class NewsCell: UITableViewCell {
     override func prepareForReuse() {
         disposeBag = DisposeBag()
     }
+    
+    func configure(_ newsItem: NewsItem, favTapHandler: @escaping (UIButton) -> Void) {
+        self.textLabel?.text = newsItem.title
+        
+        let button = UIButton(type: .system)
+        button.frame = CGRect.init(x: 0, y: 0, width: 30, height: 30)
+        
+        if (NewsFeedViewModel.favedNews.value.contains(newsItem)) {
+            button.setTitle("♥︎", for: .normal)
+            button.tag = 1
+        } else {
+            button.setTitle("♡", for: .normal)
+            button.tag = 0
+        }
+        
+        button.rx.tap.asObservable()
+            .subscribe(onNext:{ item in
+                favTapHandler(button)
+            }).addDisposableTo(self.disposeBag)
+        
+        self.accessoryView = button
+    }
 }
 
 class HomeViewController: UIViewController {
@@ -46,6 +68,24 @@ class HomeViewController: UIViewController {
         ({
             self.addChildViewController(feedsViewController)
             self.view.addSubview(feedsViewController.view)
+        })()
+    }
+}
+
+class FavedViewController: UITableViewController {
+    fileprivate let viewModel: NewsFeedViewModel = NewsFeedViewModel()
+    
+    fileprivate let disposeBag: DisposeBag = DisposeBag()
+    
+    override func viewDidLoad() {
+        // MARK: tableView
+        ({
+            tableView.frame = view.frame
+            tableView.delegate = self
+            tableView.dataSource = self
+            tableView.register(NewsCell.self, forCellReuseIdentifier: "Cell")
+            tableView.tableFooterView = UIView(frame: CGRect.zero)
+            // tableView.isHidden = true
         })()
     }
 }
@@ -135,7 +175,7 @@ class NewsFeedViewController: UITableViewController {
 
 extension NewsFeedViewController {
     func handleDataChange() {
-        viewModel.news.asObservable()
+        NewsFeedViewModel.news.asObservable()
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: {[unowned self] item in
                 
@@ -166,44 +206,23 @@ extension NewsFeedViewController {
 
 extension NewsFeedViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.news.value.currentItems.count
+        return NewsFeedViewModel.news.value.currentItems.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! NewsCell
-        let newsItem: NewsItem = viewModel.news.value.currentItems[indexPath.row]
-        cell.textLabel?.text = newsItem.title
+        let newsItem: NewsItem = NewsFeedViewModel.news.value.currentItems[indexPath.row]
         
-        
-        // MARK: Fav Button
-        ({
-            let button = UIButton(type: .system)
-            button.frame = CGRect.init(x: 0, y: 0, width: 30, height: 30)
-            
-            
-            if (self.viewModel.favedNews.value.contains(newsItem)) {
-                button.setTitle("♥︎", for: .normal)
+        cell.configure(newsItem) { [unowned self] (button) in
+            if button.tag == 0 {
                 button.tag = 1
+                button.setTitle("♥︎", for: .normal)
             } else {
-                button.setTitle("♡", for: .normal)
                 button.tag = 0
+                button.setTitle("♡", for: .normal)
             }
-            
-            button.rx.tap.asObservable()
-                .subscribe(onNext:{ [weak self] item in
-                    if button.tag == 0 {
-                        button.tag = 1
-                        button.setTitle("♥︎", for: .normal)
-                    } else {
-                        button.tag = 0
-                        button.setTitle("♡", for: .normal)
-                    }
-                    self?.viewModel.toggleFav(newsItem)
-                }).addDisposableTo(cell.disposeBag)
-            
-            cell.accessoryView = button
-        })()
-        
+            self.viewModel.toggleFav(newsItem)
+        }
         
         return cell
     }

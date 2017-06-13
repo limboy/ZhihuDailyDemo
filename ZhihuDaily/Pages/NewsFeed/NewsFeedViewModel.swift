@@ -13,9 +13,9 @@ class NewsFeedViewModel {
 
     let disposeBag: DisposeBag = DisposeBag()
     
-    var news:Variable<ResultModel<NewsItem>> = Variable(ResultModel())
+    static var news:Variable<ResultModel<NewsItem>> = Variable(ResultModel())
     
-    var favedNews: Variable<[NewsItem]> = Variable([])
+    static var favedNews: Variable<[NewsItem]> = Variable([])
     
     private var offset: String = ""
     
@@ -32,31 +32,31 @@ class NewsFeedViewModel {
     }
     
     func toggleFav(_ newsItem: NewsItem) {
-        var newslist = favedNews.value
+        var newslist = NewsFeedViewModel.favedNews.value
         let index = newslist.index(of: newsItem)
         if let index = index {
             newslist.remove(at: index)
         } else {
             newslist.append(newsItem)
         }
-        favedNews.value = newslist
+        NewsFeedViewModel.favedNews.value = newslist
     }
     
     func loadData(_ loadingType: LoadingType, offset: String = "") {
-        if (news.value.loadingStatus == .loading) {
+        if (NewsFeedViewModel.news.value.loadingStatus == .loading) {
             return
         }
 
-        var value = news.value
+        var value = NewsFeedViewModel.news.value
         
         value.loadingStatus = .loading
         value.loadingType = loadingType
-        news.value = value
+        NewsFeedViewModel.news.value = value
         
         NewsFeedRepository.news(offset).asObservable().delaySubscription(1, scheduler: MainScheduler.instance).subscribe(onNext: {[unowned self] (result) in
             let parsedResult = self._parseResult(result: result)
-            var value = self.news.value
-            value.previousItems = self.news.value.currentItems
+            var value = NewsFeedViewModel.news.value
+            value.previousItems = NewsFeedViewModel.news.value.currentItems
             
             if value.loadingType == .more {
                 value.currentItems = value.previousItems + (parsedResult?.news ?? [])
@@ -65,10 +65,10 @@ class NewsFeedViewModel {
             }
             
             value.loadingStatus = .loaded
-            self.news.value = value
+            NewsFeedViewModel.news.value = value
             self.offset = parsedResult?.date ?? ""
         }, onError: { (error) in
-            self.news.value.loadingStatus = .failure(error)
+            NewsFeedViewModel.news.value.loadingStatus = .failure(error)
         }, onCompleted: {
             
         }) { 
