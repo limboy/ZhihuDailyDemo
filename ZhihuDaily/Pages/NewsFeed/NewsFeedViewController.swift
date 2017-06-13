@@ -13,6 +13,14 @@ import RxCocoa
 import Diff
 import ESPullToRefresh
 
+class NewsCell: UITableViewCell {
+    var disposeBag = DisposeBag()
+    
+    override func prepareForReuse() {
+        disposeBag = DisposeBag()
+    }
+}
+
 class NewsFeedViewController: UITableViewController {
     
     fileprivate let viewModel: NewsFeedViewModel = NewsFeedViewModel()
@@ -36,13 +44,15 @@ class NewsFeedViewController: UITableViewController {
         return indicator
     }()
     
+    fileprivate let segmentControl:UISegmentedControl = UISegmentedControl(items: ["Latest", "Favorites"])
+    
     override func viewDidLoad() {
         // MARK: tableView
         ({
             tableView.frame = view.frame
             tableView.delegate = self
             tableView.dataSource = self
-            tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+            tableView.register(NewsCell.self, forCellReuseIdentifier: "Cell")
             tableView.tableFooterView = UIView(frame: CGRect.zero)
             // tableView.isHidden = true
         })()
@@ -78,9 +88,23 @@ class NewsFeedViewController: UITableViewController {
         
         // MARK: load more indicator
         ({
-            self.tableView.es_addInfiniteScrolling {
+            tableView.es_addInfiniteScrolling {
                 self.viewModel.loadMore()
             }
+        })()
+        
+        // MARK: segment controls
+        ({
+            segmentControl.selectedSegmentIndex = 0
+            
+            segmentControl.rx.value.asObservable()
+                .subscribe(onNext:{ [weak self] index in
+                    if (index == 0) {
+                    } else {
+                    }
+                })
+            
+            navigationItem.titleView = segmentControl
         })()
 
         handleDataChange()
@@ -132,9 +156,41 @@ extension NewsFeedViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! NewsCell
         let newsItem: NewsItem = viewModel.news.value.currentItems[indexPath.row]
-        cell?.textLabel?.text = newsItem.title
-        return cell!
+        cell.textLabel?.text = newsItem.title
+        
+        
+        // MARK: Fav Button
+        ({
+            let button = UIButton(type: .system)
+            button.frame = CGRect.init(x: 0, y: 0, width: 30, height: 30)
+            
+            
+            if (self.viewModel.favedNews.value.contains(newsItem)) {
+                button.setTitle("♥︎", for: .normal)
+                button.tag = 1
+            } else {
+                button.setTitle("♡", for: .normal)
+                button.tag = 0
+            }
+            
+            button.rx.tap.asObservable()
+                .subscribe(onNext:{ [weak self] item in
+                    if button.tag == 0 {
+                        button.tag = 1
+                        button.setTitle("♥︎", for: .normal)
+                    } else {
+                        button.tag = 0
+                        button.setTitle("♡", for: .normal)
+                    }
+                    self?.viewModel.toggleFav(newsItem)
+                }).addDisposableTo(cell.disposeBag)
+            
+            cell.accessoryView = button
+        })()
+        
+        
+        return cell
     }
 }

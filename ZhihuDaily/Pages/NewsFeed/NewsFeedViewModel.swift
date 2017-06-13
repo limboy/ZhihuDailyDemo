@@ -15,6 +15,8 @@ class NewsFeedViewModel {
     
     var news:Variable<ResultModel<NewsItem>> = Variable(ResultModel())
     
+    var favedNews: Variable<[NewsItem]> = Variable([])
+    
     private var offset: String = ""
     
     func initialLoading() {
@@ -27,6 +29,17 @@ class NewsFeedViewModel {
     
     func loadMore() {
         loadData(.more, offset: offset)
+    }
+    
+    func toggleFav(_ newsItem: NewsItem) {
+        var newslist = favedNews.value
+        let index = newslist.index(of: newsItem)
+        if let index = index {
+            newslist.remove(at: index)
+        } else {
+            newslist.append(newsItem)
+        }
+        favedNews.value = newslist
     }
     
     func loadData(_ loadingType: LoadingType, offset: String = "") {
