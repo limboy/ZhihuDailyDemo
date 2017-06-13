@@ -21,6 +21,35 @@ class NewsCell: UITableViewCell {
     }
 }
 
+class HomeViewController: UIViewController {
+    
+    fileprivate let segmentControl: UISegmentedControl = UISegmentedControl(items: ["Latest", "Favorites"])
+    
+    fileprivate let feedsViewController: NewsFeedViewController = NewsFeedViewController()
+    
+    override func viewDidLoad() {
+        // MARK: segment controls
+        ({
+            segmentControl.selectedSegmentIndex = 0
+            
+            segmentControl.rx.value.asObservable()
+                .subscribe(onNext:{ [weak self] index in
+                    if (index == 0) {
+                    } else {
+                    }
+                })
+            
+            navigationItem.titleView = segmentControl
+        })()
+        
+        // MARK: add child view controller
+        ({
+            self.addChildViewController(feedsViewController)
+            self.view.addSubview(feedsViewController.view)
+        })()
+    }
+}
+
 class NewsFeedViewController: UITableViewController {
     
     fileprivate let viewModel: NewsFeedViewModel = NewsFeedViewModel()
@@ -44,7 +73,6 @@ class NewsFeedViewController: UITableViewController {
         return indicator
     }()
     
-    fileprivate let segmentControl:UISegmentedControl = UISegmentedControl(items: ["Latest", "Favorites"])
     
     override func viewDidLoad() {
         // MARK: tableView
@@ -93,20 +121,6 @@ class NewsFeedViewController: UITableViewController {
             }
         })()
         
-        // MARK: segment controls
-        ({
-            segmentControl.selectedSegmentIndex = 0
-            
-            segmentControl.rx.value.asObservable()
-                .subscribe(onNext:{ [weak self] index in
-                    if (index == 0) {
-                    } else {
-                    }
-                })
-            
-            navigationItem.titleView = segmentControl
-        })()
-
         handleDataChange()
         
         viewModel.initialLoading()
