@@ -1,4 +1,4 @@
 github "ReSwift/ReSwift"
 github "ReactiveX/RxSwift" ~> 3.0
 github "wokalski/Diff.swift"
-github "Moya/Moya"
+github "eggswift/pull-to-refresh"

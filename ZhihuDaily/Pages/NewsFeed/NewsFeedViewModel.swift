@@ -15,6 +15,8 @@ class NewsFeedViewModel {
     
     var news:Variable<ResultModel<NewsItem>> = Variable(ResultModel())
     
+    private var offset: String = ""
+    
     func initialLoading() {
         loadData(.initial)
     }
@@ -23,7 +25,7 @@ class NewsFeedViewModel {
         loadData(.refresh)
     }
     
-    func loadMore(_ offset: String) {
+    func loadMore() {
         loadData(.more, offset: offset)
     }
     
@@ -42,9 +44,16 @@ class NewsFeedViewModel {
             let parsedResult = self._parseResult(result: result)
             var value = self.news.value
             value.previousItems = self.news.value.currentItems
-            value.currentItems = parsedResult?.news ?? []
+            
+            if value.loadingType == .more {
+                value.currentItems = value.previousItems + (parsedResult?.news ?? [])
+            } else {
+                value.currentItems = parsedResult?.news ?? []
+            }
+            
             value.loadingStatus = .loaded
             self.news.value = value
+            self.offset = parsedResult?.date ?? ""
         }, onError: { (error) in
             self.news.value.loadingStatus = .failure(error)
         }, onCompleted: {

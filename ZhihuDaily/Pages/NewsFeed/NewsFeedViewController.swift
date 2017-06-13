@@ -11,6 +11,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 import Diff
+import ESPullToRefresh
 
 class NewsFeedViewController: UITableViewController {
     
@@ -27,6 +28,12 @@ class NewsFeedViewController: UITableViewController {
         button.frame = CGRect(x: UIScreen.main.bounds.width / 2 - 32, y: 100, width: 64, height: 32)
         button.setTitle("Reload", for: .normal)
         return button
+    }()
+    
+    fileprivate let loadMoreIndicator:UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+        indicator.isHidden = true
+        return indicator
     }()
     
     override func viewDidLoad() {
@@ -68,6 +75,13 @@ class NewsFeedViewController: UITableViewController {
                 self.viewModel.initialLoading()
             }).addDisposableTo(disposeBag)
         })()
+        
+        // MARK: load more indicator
+        ({
+            self.tableView.es_addInfiniteScrolling {
+                self.viewModel.loadMore()
+            }
+        })()
 
         handleDataChange()
         
@@ -90,12 +104,13 @@ extension NewsFeedViewController {
                 if item.loadingStatus != .loading {
                     self.initialLoadingIndicator.stopAnimating()
                     self.refreshIndicator.endRefreshing()
+                    self.tableView.es_stopLoadingMore()
                 }
                 
                 if item.loadingStatus == .loaded {
                     self.tableView.animateRowChanges(oldData: item.previousItems, newData: item.currentItems)
                 }
-                    
+                
                 if item.loadingType == .initial && item.loadingStatus == .loading {
                     self.initialLoadingIndicator.startAnimating()
                 }
