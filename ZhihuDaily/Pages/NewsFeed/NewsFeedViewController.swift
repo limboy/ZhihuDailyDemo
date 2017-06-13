@@ -13,6 +13,7 @@ import RxCocoa
 import Diff
 import ESPullToRefresh
 
+// MARK: NewsCell
 class NewsCell: UITableViewCell {
     var disposeBag = DisposeBag()
     
@@ -43,23 +44,34 @@ class NewsCell: UITableViewCell {
     }
 }
 
+
+// MARK: HomeViewController
 class HomeViewController: UIViewController {
     
-    fileprivate let segmentControl: UISegmentedControl = UISegmentedControl(items: ["Latest", "Favorites"])
+    fileprivate let segmentControl = UISegmentedControl(items: ["Latest", "Favorites"])
     
-    fileprivate let feedsViewController: NewsFeedViewController = NewsFeedViewController()
+    fileprivate let feedsViewController = NewsFeedViewController()
+    
+    fileprivate let favedViewController = FavedViewController()
+    
+    fileprivate let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
+        self.automaticallyAdjustsScrollViewInsets = false
         // MARK: segment controls
         ({
             segmentControl.selectedSegmentIndex = 0
             
             segmentControl.rx.value.asObservable()
-                .subscribe(onNext:{ [weak self] index in
+                .subscribe(onNext:{ [unowned self] index in
                     if (index == 0) {
+                        self.favedViewController.view.isHidden = true
+                        self.feedsViewController.view.isHidden = false
                     } else {
+                        self.favedViewController.view.isHidden = false
+                        self.feedsViewController.view.isHidden = true
                     }
-                })
+                }).addDisposableTo(disposeBag)
             
             navigationItem.titleView = segmentControl
         })()
@@ -68,16 +80,23 @@ class HomeViewController: UIViewController {
         ({
             self.addChildViewController(feedsViewController)
             self.view.addSubview(feedsViewController.view)
+            
+            self.addChildViewController(favedViewController)
+            self.view.addSubview(favedViewController.view)
+            favedViewController.view.isHidden = true
         })()
     }
 }
 
+
+// MARK: FavedViewController
 class FavedViewController: UITableViewController {
     fileprivate let viewModel: NewsFeedViewModel = NewsFeedViewModel()
     
     fileprivate let disposeBag: DisposeBag = DisposeBag()
     
     override func viewDidLoad() {
+        tableView.contentInset = UIEdgeInsetsMake(44, 0, 0, 0)
         // MARK: tableView
         ({
             tableView.frame = view.frame
@@ -87,9 +106,46 @@ class FavedViewController: UITableViewController {
             tableView.tableFooterView = UIView(frame: CGRect.zero)
             // tableView.isHidden = true
         })()
+        
+        handleDataChange()
     }
 }
 
+extension FavedViewController {
+    func handleDataChange() {
+        NewsFeedViewModel.favedNews.asObservable().subscribe(onNext:{[unowned self] item in
+            self.tableView.reloadData()
+        }).addDisposableTo(disposeBag)
+    }
+}
+
+extension FavedViewController {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return NewsFeedViewModel.favedNews.value.count
+    }
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! NewsCell
+        let newsItem: NewsItem = NewsFeedViewModel.favedNews.value[indexPath.row]
+        
+        cell.configure(newsItem) { [unowned self] (button) in
+            if button.tag == 0 {
+                button.tag = 1
+                button.setTitle("♥︎", for: .normal)
+            } else {
+                button.tag = 0
+                button.setTitle("♡", for: .normal)
+            }
+            self.viewModel.toggleFav(newsItem)
+            self.tableView.reloadData()
+        }
+        
+        return cell
+    }
+}
+
+
+// MARK: NewsFeedViewController
 class NewsFeedViewController: UITableViewController {
     
     fileprivate let viewModel: NewsFeedViewModel = NewsFeedViewModel()
@@ -115,6 +171,8 @@ class NewsFeedViewController: UITableViewController {
     
     
     override func viewDidLoad() {
+        tableView.contentInset = UIEdgeInsetsMake(44, 0, 0, 0)
+
         // MARK: tableView
         ({
             tableView.frame = view.frame
