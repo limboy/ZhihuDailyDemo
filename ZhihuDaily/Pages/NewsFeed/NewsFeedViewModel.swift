@@ -13,7 +13,7 @@ class NewsFeedViewModel {
 
     let disposeBag: DisposeBag = DisposeBag()
     
-    var news:Variable<ResultModel<NewsList>> = Variable(ResultModel())
+    var news:Variable<ResultModel<NewsItem>> = Variable(ResultModel())
     
     func initialLoading() {
         loadData(.initial)
@@ -42,7 +42,7 @@ class NewsFeedViewModel {
             let parsedResult = self._parseResult(result: result)
             var value = self.news.value
             value.previousItems = self.news.value.currentItems
-            value.currentItems = parsedResult
+            value.currentItems = parsedResult?.news ?? []
             value.loadingStatus = .loaded
             self.news.value = value
         }, onError: { (error) in
@@ -66,7 +66,7 @@ private extension NewsFeedViewModel {
         if let stories = result?["stories"] as? [[String:Any]] {
             for story in stories {
                 let newsItem = NewsItem(id: story["id"] as! NSNumber,
-                                        images: story["images"] as? [String],
+                                        images: story["images"] as! [String],
                                         title: story["title"] as! String)
                 news.append(newsItem)
             }

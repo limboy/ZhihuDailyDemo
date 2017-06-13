@@ -36,6 +36,6 @@ struct ResultModel<T> {
     var loadingStatus: LoadingStatus = .none
     var loadingType: LoadingType = .initial
     
-    var previousItems: T?
-    var currentItems: T?
+    var previousItems = [T]()
+    var currentItems = [T]()
 }

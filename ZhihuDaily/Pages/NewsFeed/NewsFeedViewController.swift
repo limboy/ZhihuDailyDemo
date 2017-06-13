@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import RxSwift
 import RxCocoa
+import Diff
 
 class NewsFeedViewController: UITableViewController {
     
@@ -86,36 +87,38 @@ extension NewsFeedViewController {
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: {[unowned self] item in
                 
-                dump(item.loadingType)
-                dump(item.loadingStatus)
-                
                 if item.loadingStatus != .loading {
                     self.initialLoadingIndicator.stopAnimating()
                     self.refreshIndicator.endRefreshing()
-                } else {
-                    if item.loadingType == .initial {
-                        self.initialLoadingIndicator.startAnimating()
-                    }
-                    //TODO: add loading more
+                }
+                
+                if item.loadingStatus == .loaded {
+                    self.tableView.animateRowChanges(oldData: item.previousItems, newData: item.currentItems)
+                }
+                    
+                if item.loadingType == .initial && item.loadingStatus == .loading {
+                    self.initialLoadingIndicator.startAnimating()
                 }
                 
                 if case .failure(let error) = item.loadingStatus {
+                    dump(error)
                     if item.loadingType == .initial {
                         self.reloadButton.isHidden = false
                     }
                 }
+                
             }).addDisposableTo(disposeBag)
     }
 }
 
 extension NewsFeedViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.news.value.currentItems?.news?.count ?? 0
+        return viewModel.news.value.currentItems.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
-        let newsItem: NewsItem = viewModel.news.value.currentItems!.news![indexPath.row]
+        let newsItem: NewsItem = viewModel.news.value.currentItems[indexPath.row]
         cell?.textLabel?.text = newsItem.title
         return cell!
     }

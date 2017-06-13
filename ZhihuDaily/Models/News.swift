@@ -5,10 +5,14 @@
 
 import Foundation
 
-struct NewsItem {
+struct NewsItem: Equatable {
     var id: NSNumber
-    var images: [String]?
+    var images: [String] = []
     var title: String
+    
+    static func == (lhs:NewsItem, rhs:NewsItem) -> Bool {
+        return lhs.id == rhs.id
+    }
 }
 
 struct NewsList {
