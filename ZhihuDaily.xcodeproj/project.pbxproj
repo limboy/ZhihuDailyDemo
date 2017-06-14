@@ -31,6 +31,7 @@
 		6ADC97E61EC2E8E0009F3795 /* RxSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6ADC97DF1EC2E8E0009F3795 /* RxSwift.framework */; };
 		6ADC97E71EC2E8E0009F3795 /* RxSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6ADC97DF1EC2E8E0009F3795 /* RxSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6ADC97ED1EC44B0A009F3795 /* CartService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADC97EC1EC44B0A009F3795 /* CartService.swift */; };
+		6AED2D741EF16C50004C9B3F /* NewsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AED2D731EF16C50004C9B3F /* NewsCell.swift */; };
 		BE46124E8B548C7EB504492E /* UINavigationController+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE461FDC485DAF4EA25E1A93 /* UINavigationController+Helper.swift */; };
 		BE461C317C00BBC20077B221 /* NewsListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE461BCD1D4B351D78C5C819 /* NewsListTests.swift */; };
 		BE461ED7A1AB13C9EFEE9DB3 /* News.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4613A5ED19090537CA7A62 /* News.swift */; };
@@ -87,6 +88,7 @@
 		6ADC97DE1EC2E8E0009F3795 /* RxCocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RxCocoa.framework; path = ../../Carthage/Build/iOS/RxCocoa.framework; sourceTree = "<group>"; };
 		6ADC97DF1EC2E8E0009F3795 /* RxSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RxSwift.framework; path = ../../Carthage/Build/iOS/RxSwift.framework; sourceTree = "<group>"; };
 		6ADC97EC1EC44B0A009F3795 /* CartService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartService.swift; sourceTree = "<group>"; };
+		6AED2D731EF16C50004C9B3F /* NewsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NewsCell.swift; path = ZhihuDaily/Extensions/NewsCell.swift; sourceTree = SOURCE_ROOT; };
 		BE4613A5ED19090537CA7A62 /* News.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = News.swift; sourceTree = "<group>"; };
 		BE461BCD1D4B351D78C5C819 /* NewsListTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewsListTests.swift; sourceTree = "<group>"; };
 		BE461FDC485DAF4EA25E1A93 /* UINavigationController+Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UINavigationController+Helper.swift"; path = "Extensions/UINavigationController+Helper.swift"; sourceTree = "<group>"; };
@@ -293,6 +295,7 @@
 		6ADC97D41EC24CFC009F3795 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				6AED2D731EF16C50004C9B3F /* NewsCell.swift */,
 			);
 			name = Components;
 			path = Widgets;
@@ -433,6 +436,7 @@
 				6A54D4811EECC34A0001FAEE /* ResultModel.swift in Sources */,
 				BE461ED7A1AB13C9EFEE9DB3 /* News.swift in Sources */,
 				6A54D4791EE8BB330001FAEE /* NewsFeedViewController.swift in Sources */,
+				6AED2D741EF16C50004C9B3F /* NewsCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
