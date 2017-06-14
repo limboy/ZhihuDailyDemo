@@ -17,8 +17,8 @@ enum RouterTable: String {
         switch self {
         case .home:
             return NewsFeedViewController.self
-        default:
-            return UIViewController.self
+        case .detail:
+            return NewsDetailViewController.self
         }
     }
 }
