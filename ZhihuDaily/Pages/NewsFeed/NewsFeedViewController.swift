@@ -252,4 +252,9 @@ extension NewsFeedViewController {
         
         return cell
     }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let newsItem: NewsItem = NewsFeedViewModel.news.value.currentItems[indexPath.row]
+        Router.to(.detail, parameters: ["id": newsItem.id])
+    }
 }

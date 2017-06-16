@@ -28,9 +28,12 @@ class Router {
         let viewController = route.asController().init()
 
         if let parameters = parameters {
-            viewController.setValuesForKeys(parameters)
+            for (key, value) in parameters {
+                viewController.putExtra(key, value)
+            }
         }
 
+        //TODO: 添加 shouldBePushed 调用，比如有些页面需要先登录
         DispatchQueue.main.async {
             UINavigationController.current().pushViewController(viewController, animated: true)
         }
@@ -39,7 +42,7 @@ class Router {
 
 extension Router {
     func parseURL(_ url: String) -> (RouterTable, Dictionary<String, String>?) {
-        //TODO add implementation
+        //TODO: add implementation
         return (.home, nil)
     }
 }
