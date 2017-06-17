@@ -9,6 +9,7 @@ struct NewsItem: Equatable {
     var id: NSNumber
     var images: [String] = []
     var title: String
+    var hasFaved: Bool = false
     
     static func == (lhs:NewsItem, rhs:NewsItem) -> Bool {
         return lhs.id == rhs.id

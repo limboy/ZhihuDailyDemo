@@ -14,14 +14,21 @@ class NewsDetailViewController: UIViewController {
     
     var webView = UIWebView()
     
+    var favButton = UIButton(type: .system)
+    
     let viewModel = NewsDetaiViewModel()
     
     fileprivate let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
+        
+        // webview
         webView.frame = view.frame
         view.addSubview(webView)
+        
         handleDataChange()
+        
+        // 
         if let id = self.getExtra("id") as? Int {
             viewModel.load(id)
         }

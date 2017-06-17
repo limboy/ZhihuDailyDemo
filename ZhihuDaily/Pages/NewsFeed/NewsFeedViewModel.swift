@@ -32,14 +32,12 @@ class NewsFeedViewModel {
     }
     
     func toggleFav(_ newsItem: NewsItem) {
-        var newslist = NewsFeedViewModel.favedNews.value
-        let index = newslist.index(of: newsItem)
-        if let index = index {
-            newslist.remove(at: index)
-        } else {
-            newslist.append(newsItem)
+        if let newsIndex = NewsFeedViewModel.news.value.currentItems.index(of: newsItem) {
+            var _newsItem = NewsFeedViewModel.news.value.currentItems[newsIndex]
+            _newsItem.hasFaved = !_newsItem.hasFaved
+            NewsFeedViewModel.news.value.currentItems[newsIndex] = _newsItem
+            _handleFavesChange()
         }
-        NewsFeedViewModel.favedNews.value = newslist
     }
     
     func loadData(_ loadingType: LoadingType, offset: String = "") {
@@ -67,6 +65,9 @@ class NewsFeedViewModel {
             value.loadingStatus = .loaded
             NewsFeedViewModel.news.value = value
             self.offset = parsedResult?.date ?? ""
+            value.loadingStatus = .none
+            NewsFeedViewModel.news.value = value
+
         }, onError: { (error) in
             NewsFeedViewModel.news.value.loadingStatus = .failure(error)
         }, onCompleted: {
@@ -80,6 +81,12 @@ class NewsFeedViewModel {
 
 private extension NewsFeedViewModel {
     
+    func _handleFavesChange() {
+        NewsFeedViewModel.favedNews.value = NewsFeedViewModel.news.value.currentItems.filter { (item) -> Bool in
+            return item.hasFaved
+        }
+    }
+    
     func _parseResult(result: [String:Any]?) -> NewsList? {
         
         var news:[NewsItem] = []
@@ -89,7 +96,8 @@ private extension NewsFeedViewModel {
             for story in stories {
                 let newsItem = NewsItem(id: story["id"] as! NSNumber,
                                         images: story["images"] as! [String],
-                                        title: story["title"] as! String)
+                                        title: story["title"] as! String,
+                                        hasFaved: false)
                 news.append(newsItem)
             }
             

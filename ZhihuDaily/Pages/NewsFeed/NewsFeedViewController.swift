@@ -94,7 +94,7 @@ extension FavedViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! NewsCell
-        let newsItem: NewsItem = NewsFeedViewModel.favedNews.value[indexPath.row]
+        var newsItem: NewsItem = NewsFeedViewModel.favedNews.value[indexPath.row]
         
         cell.configure(newsItem) { [unowned self] (button) in
             if button.tag == 0 {
@@ -237,7 +237,7 @@ extension NewsFeedViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! NewsCell
-        let newsItem: NewsItem = NewsFeedViewModel.news.value.currentItems[indexPath.row]
+        var newsItem: NewsItem = NewsFeedViewModel.news.value.currentItems[indexPath.row]
         
         cell.configure(newsItem) { [unowned self] (button) in
             if button.tag == 0 {
