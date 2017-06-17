@@ -19,6 +19,14 @@ class NewsFeedViewModel {
     
     private var offset: String = ""
     
+    init() {
+        NewsFeedViewModel.news.asObservable().subscribe(onNext: { item in
+            NewsFeedViewModel.favedNews.value = NewsFeedViewModel.news.value.currentItems.filter { (item) -> Bool in
+                return item.hasFaved
+            }
+        }).addDisposableTo(disposeBag)
+    }
+    
     func initialLoading() {
         loadData(.initial)
     }
@@ -33,10 +41,12 @@ class NewsFeedViewModel {
     
     func toggleFav(_ newsItem: NewsItem) {
         if let newsIndex = NewsFeedViewModel.news.value.currentItems.index(of: newsItem) {
+            // TODO 感觉可以参考 Immutable.js，提供一些方法，来返回新的 object
             var _newsItem = NewsFeedViewModel.news.value.currentItems[newsIndex]
             _newsItem.hasFaved = !_newsItem.hasFaved
-            NewsFeedViewModel.news.value.currentItems[newsIndex] = _newsItem
-            _handleFavesChange()
+            var value = NewsFeedViewModel.news.value
+            value.currentItems[newsIndex] = _newsItem
+            NewsFeedViewModel.news.value = value
         }
     }
     
@@ -76,17 +86,10 @@ class NewsFeedViewModel {
             
         }.addDisposableTo(disposeBag)
     }
-    
 }
 
 private extension NewsFeedViewModel {
-    
-    func _handleFavesChange() {
-        NewsFeedViewModel.favedNews.value = NewsFeedViewModel.news.value.currentItems.filter { (item) -> Bool in
-            return item.hasFaved
-        }
-    }
-    
+
     func _parseResult(result: [String:Any]?) -> NewsList? {
         
         var news:[NewsItem] = []

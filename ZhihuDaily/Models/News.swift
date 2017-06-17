@@ -12,7 +12,7 @@ struct NewsItem: Equatable {
     var hasFaved: Bool = false
     
     static func == (lhs:NewsItem, rhs:NewsItem) -> Bool {
-        return lhs.id == rhs.id
+        return lhs.id == rhs.id && lhs.hasFaved == rhs.hasFaved
     }
 }
 

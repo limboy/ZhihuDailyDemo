@@ -9,22 +9,26 @@
 import Foundation
 import RxSwift
 
-class NewsDetaiViewModel {
+class NewsDetailViewModel {
     
     static var newsDetail = Variable<NewsDetail?>(nil)
     
+    static var newsItem: Variable<NewsItem>?
+    
     private let disposeBag = DisposeBag()
+    
     func load(_ id: Int) {
         NewsDetailRepository.detail(id)
             .subscribe(onNext: { [unowned self] item in
                 let result = self._parseResult(result: item)
-                NewsDetaiViewModel.newsDetail.value = result
+                NewsDetailViewModel.newsDetail.value = result
             })
             .addDisposableTo(disposeBag)
     }
+
 }
 
-private extension NewsDetaiViewModel {
+private extension NewsDetailViewModel {
     
     func _parseResult(result: [String:Any]?) -> NewsDetail {
         

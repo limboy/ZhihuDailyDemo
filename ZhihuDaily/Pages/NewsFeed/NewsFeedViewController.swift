@@ -237,8 +237,8 @@ extension NewsFeedViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! NewsCell
-        var newsItem: NewsItem = NewsFeedViewModel.news.value.currentItems[indexPath.row]
-        
+        let newsItem: NewsItem = NewsFeedViewModel.news.value.currentItems[indexPath.row]
+        dump(newsItem)
         cell.configure(newsItem) { [unowned self] (button) in
             if button.tag == 0 {
                 button.tag = 1
@@ -255,6 +255,11 @@ extension NewsFeedViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let newsItem: NewsItem = NewsFeedViewModel.news.value.currentItems[indexPath.row]
-        Router.to(.detail, parameters: ["id": newsItem.id])
+        let newsItemVariable = Variable<NewsItem>(newsItem)
+        newsItemVariable.asObservable().subscribe(onNext: { [unowned self] item in
+            self.viewModel.toggleFav(newsItem)
+            self.tableView.reloadData()
+        }).addDisposableTo(disposeBag)
+        Router.to(.detail, parameters: ["model": newsItemVariable])
     }
 }
