@@ -30,7 +30,7 @@ class NewsDetailViewController: UIViewController {
         // favButton
         navigationItem.rightBarButtonItem = favButton
         favButton.rx.tap
-            .subscribe(onNext: { [unowned self] item in
+            .subscribe(onNext: { item in
                 if let newsItem = NewsDetailViewModel.newsItem {
                     var value = newsItem.value
                     value.hasFaved = !newsItem.value.hasFaved
@@ -39,9 +39,9 @@ class NewsDetailViewController: UIViewController {
             }).addDisposableTo(disposeBag)
         
         //
-        if let id = self.getExtra("id") as? Int {
+        // if let id = self.getExtra("id") as? Int {
             // viewModel.load(id)
-        }
+        // }
         
         if let model = self.getExtra("model") as? Variable<NewsItem> {
             favButton.title = model.value.hasFaved ? "♥︎" : "♡"
